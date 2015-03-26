@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -517,10 +517,10 @@ bool RTIMUMPU9250::IMURead()
 
     count = ((unsigned int)fifoCount[0] << 8) + fifoCount[1];
 
-    if (count == 1024) {
-        HAL_INFO("MPU9250 fifo has overflowed");
+    if (count == 512) {
+        HAL_INFO("MPU-9250 fifo has overflowed");
         resetFifo();
-        m_imuData.timestamp += m_sampleInterval * (1024 / MPU9250_FIFO_CHUNK_SIZE + 1); // try to fix timestamp
+        m_imuData.timestamp += m_sampleInterval * (512 / MPU9250_FIFO_CHUNK_SIZE + 1); // try to fix timestamp
         return false;
     }
 
@@ -620,6 +620,12 @@ bool RTIMUMPU9250::IMURead()
 
     m_imuData.accel.setX(-m_imuData.accel.x());
 
+    //  use the compass fuse data adjustments
+
+    m_imuData.compass.setX(m_imuData.compass.x() * m_compassAdjust[0]);
+    m_imuData.compass.setY(m_imuData.compass.y() * m_compassAdjust[1]);
+    m_imuData.compass.setZ(m_imuData.compass.z() * m_compassAdjust[2]);
+
     //  sort out compass axes
 
     float temp;
@@ -627,12 +633,6 @@ bool RTIMUMPU9250::IMURead()
     temp = m_imuData.compass.x();
     m_imuData.compass.setX(m_imuData.compass.y());
     m_imuData.compass.setY(-temp);
-
-    //  use the fuse data adjustments
-
-    m_imuData.compass.setX(m_imuData.compass.x() * m_compassAdjust[0]);
-    m_imuData.compass.setY(m_imuData.compass.y() * m_compassAdjust[1]);
-    m_imuData.compass.setZ(m_imuData.compass.z() * m_compassAdjust[2]);
 
     //  now do standard processing
 

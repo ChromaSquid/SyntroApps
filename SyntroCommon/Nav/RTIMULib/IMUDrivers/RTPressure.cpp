@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -21,34 +21,46 @@
 //  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "RTIMUNull.h"
-#include "RTIMUSettings.h"
 
-RTIMUNull::RTIMUNull(RTIMUSettings *settings) : RTIMU(settings)
+#include "RTPressure.h"
+
+#include "RTPressureBMP180.h"
+#include "RTPressureLPS25H.h"
+#include "RTPressureMS5611.h"
+
+RTPressure *RTPressure::createPressure(RTIMUSettings *settings)
 {
+    switch (settings->m_pressureType) {
+    case RTPRESSURE_TYPE_BMP180:
+        return new RTPressureBMP180(settings);
+
+    case RTPRESSURE_TYPE_LPS25H:
+        return new RTPressureLPS25H(settings);
+
+    case RTPRESSURE_TYPE_MS5611:
+        return new RTPressureMS5611(settings);
+
+    case RTPRESSURE_TYPE_AUTODISCOVER:
+        if (settings->discoverPressure(settings->m_pressureType, settings->m_I2CPressureAddress)) {
+            settings->saveSettings();
+            return RTPressure::createPressure(settings);
+        }
+        return NULL;
+
+    case RTPRESSURE_TYPE_NULL:
+        return NULL;
+
+    default:
+        return NULL;
+    }
 }
 
-RTIMUNull::~RTIMUNull()
+
+RTPressure::RTPressure(RTIMUSettings *settings)
 {
+    m_settings = settings;
 }
 
-bool RTIMUNull::IMUInit()
+RTPressure::~RTPressure()
 {
-    return true;
-}
-
-int RTIMUNull::IMUGetPollInterval()
-{
-    return (100);                                           // just a dummy value really
-}
-
-bool RTIMUNull::IMURead()
-{
-    updateFusion();
-    return true;
-}
-
-void RTIMUNull::setIMUData(const RTIMU_DATA& data)
-{
-    m_imuData = data;
 }

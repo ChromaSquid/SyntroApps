@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -71,6 +71,30 @@ const char *RTMath::display(const char *label, RTMatrix4x4& mat)
             label, mat.val(3,0), mat.val(3,1), mat.val(3,2), mat.val(3,3));
     return m_string;
 }
+
+//  convertPressureToHeight() - the conversion uses the formula:
+//
+//  h = (T0 / L0) * ((p / P0)**(-(R* * L0) / (g0 * M)) - 1)
+//
+//  where:
+//  h  = height above sea level
+//  T0 = standard temperature at sea level = 288.15
+//  L0 = standard temperatur elapse rate = -0.0065
+//  p  = measured pressure
+//  P0 = static pressure = 1013.25 (but can be overridden)
+//  g0 = gravitational acceleration = 9.80665
+//  M  = mloecular mass of earth's air = 0.0289644
+//  R* = universal gas constant = 8.31432
+//
+//  Given the constants, this works out to:
+//
+//  h = 44330.8 * (1 - (p / P0)**0.190263)
+
+RTFLOAT RTMath::convertPressureToHeight(RTFLOAT pressure, RTFLOAT staticPressure)
+{
+    return 44330.8 * (1 - pow(pressure / staticPressure, (RTFLOAT)0.190263));
+}
+
 
 RTVector3 RTMath::poseFromAccelMag(const RTVector3& accel, const RTVector3& mag)
 {
