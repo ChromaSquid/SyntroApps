@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -24,9 +24,9 @@
 //  The MPU-9250 and SPI driver code is based on code generously supplied by
 //  staslock@gmail.com (www.clickdrive.io)
 
-#include "RTIMU.h"
+#include "IMUDrivers/RTIMU.h"
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
 
 #include <linux/spi/spidev.h>
 
@@ -41,8 +41,7 @@ RTIMUHal::RTIMUHal()
 
 RTIMUHal::~RTIMUHal()
 {
-    I2CClose();
-    SPIClose();
+    HALClose();
 }
 
 bool RTIMUHal::HALOpen()
@@ -73,10 +72,10 @@ bool RTIMUHal::HALOpen()
             return false;
         }
 
-        sprintf(buf, "/dev/spidev%d.0", m_SPIBus);
+        sprintf(buf, "/dev/spidev%d.%d", m_SPIBus, m_SPISelect);
         m_SPI = open(buf, O_RDWR);
         if (m_SPI < 0) {
-            HAL_ERROR1("Failed to open SPI bus %d\n", m_SPIBus);
+            HAL_ERROR2("Failed to open SPI bus %d, select %d\n", m_SPIBus, m_SPISelect);
             m_SPI = -1;
             return false;
         }
@@ -118,6 +117,12 @@ bool RTIMUHal::HALOpen()
         }
     }
     return true;
+}
+
+void RTIMUHal::HALClose()
+{
+    I2CClose();
+    SPIClose();
 }
 
 void RTIMUHal::I2CClose()
@@ -302,6 +307,10 @@ RTIMUHal::~RTIMUHal()
 bool RTIMUHal::HALOpen()
 {
     return true;
+}
+
+void RTIMUHal::HALClose()
+{
 }
 
 void RTIMUHal::I2CClose()

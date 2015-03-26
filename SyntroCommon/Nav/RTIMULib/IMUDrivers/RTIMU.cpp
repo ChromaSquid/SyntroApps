@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -31,6 +31,7 @@
 #include "RTIMUMPU9250.h"
 #include "RTIMUGD20HM303D.h"
 #include "RTIMUGD20M303DLHC.h"
+#include "RTIMUGD20HM303DLHC.h"
 #include "RTIMULSM9DS0.h"
 
 //  this sets the learning rate for compass running average calculation
@@ -97,12 +98,15 @@ RTIMU *RTIMU::createIMU(RTIMUSettings *settings)
     case RTIMU_TYPE_MPU9250:
         return new RTIMUMPU9250(settings);
 
+    case RTIMU_TYPE_GD20HM303DLHC:
+        return new RTIMUGD20HM303DLHC(settings);
+
     case RTIMU_TYPE_AUTODISCOVER:
         if (settings->discoverIMU(settings->m_imuType, settings->m_busIsI2C, settings->m_I2CSlaveAddress)) {
             settings->saveSettings();
             return RTIMU::createIMU(settings);
         }
-        return NULL;
+        return new RTIMUNull(settings);
 
     case RTIMU_TYPE_NULL:
         return new RTIMUNull(settings);
@@ -349,7 +353,7 @@ void RTIMU::calibrateAccel()
 
 void RTIMU::updateFusion()
 {
-    m_fusion->newIMUData(m_imuData);
+    m_fusion->newIMUData(m_imuData, m_settings);
 }
 
 bool RTIMU::IMUGyroBiasValid()
@@ -357,3 +361,18 @@ bool RTIMU::IMUGyroBiasValid()
     return m_settings->m_gyroBiasValid;
 }
 
+ void RTIMU::setExtIMUData(RTFLOAT gx, RTFLOAT gy, RTFLOAT gz, RTFLOAT ax, RTFLOAT ay, RTFLOAT az,
+        RTFLOAT mx, RTFLOAT my, RTFLOAT mz, uint64_t timestamp)
+ {
+     m_imuData.gyro.setX(gx);
+     m_imuData.gyro.setY(gy);
+     m_imuData.gyro.setZ(gz);
+     m_imuData.accel.setX(ax);
+     m_imuData.accel.setY(ay);
+     m_imuData.accel.setZ(az);
+     m_imuData.compass.setX(mx);
+     m_imuData.compass.setY(my);
+     m_imuData.compass.setZ(mz);
+     m_imuData.timestamp = timestamp;
+     updateFusion();
+}

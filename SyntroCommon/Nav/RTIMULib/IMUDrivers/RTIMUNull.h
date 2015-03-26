@@ -21,31 +21,38 @@
 //  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef _RTIMUNULL_H
+#define	_RTIMUNULL_H
 
-#ifndef _RTIMULIB_H
-#define	_RTIMULIB_H
+//  IMUNull is a dummy IMU that assumes sensor data is coming from elsewhere,
+//  for example, across a network.
+//
+//  Call IMUInit in the normal way. Then for every update, call setIMUData and then IMURead
+//  to kick the kalman filter.
 
-#include "RTIMULibDefs.h"
+#include "RTIMU.h"
 
-#include "RTMath.h"
+class RTIMUSettings;
 
-#include "RTFusion.h"
-#include "RTFusionKalman4.h"
+class RTIMUNull : public RTIMU
+{
+public:
+    RTIMUNull(RTIMUSettings *settings);
+    ~RTIMUNull();
 
-#include "RTIMUHal.h"
-#include "IMUDrivers/RTIMU.h"
-#include "IMUDrivers/RTIMUNull.h"
-#include "IMUDrivers/RTIMUMPU9150.h"
-#include "IMUDrivers/RTIMUGD20HM303D.h"
-#include "IMUDrivers/RTIMUGD20M303DLHC.h"
-#include "IMUDrivers/RTIMULSM9DS0.h"
+    // The timestamp parameter is assumed to be from RTMath::currentUSecsSinceEpoch()
 
-#include "IMUDrivers/RTPressure.h"
-#include "IMUDrivers/RTPressureBMP180.h"
-#include "IMUDrivers/RTPressureLPS25H.h"
-#include "IMUDrivers/RTPressureMS5611.h"
+    void setIMUData(const RTIMU_DATA& data);
 
-#include "RTIMUSettings.h"
+    virtual const char *IMUName() { return "Null IMU"; }
+    virtual int IMUType() { return RTIMU_TYPE_NULL; }
+    virtual bool IMUInit();
+    virtual int IMUGetPollInterval();
+    virtual bool IMURead();
+    virtual bool IMUGyroBiasValid() { return true; }
 
+private:
+    uint64_t m_timestamp;
+};
 
-#endif // _RTIMULIB_H
+#endif // _RTIMUNULL_H

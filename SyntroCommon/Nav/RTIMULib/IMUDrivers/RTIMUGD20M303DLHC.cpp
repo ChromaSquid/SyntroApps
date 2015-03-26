@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -482,7 +482,7 @@ bool RTIMUGD20M303DLHC::IMURead()
     if (!m_settings->HALRead(m_gyroSlaveAddr, L3GD20_STATUS, 1, &status, "Failed to read L3GD20 status"))
         return false;
 
-    if ((status && 0x8) == 0)
+    if ((status & 0x8) == 0)
         return false;
 
     if (!m_settings->HALRead(m_gyroSlaveAddr, 0x80 | L3GD20_OUT_X_L, 6, gyroData, "Failed to read L3GD20 data"))

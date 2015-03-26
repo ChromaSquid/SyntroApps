@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -60,10 +60,16 @@ bool RTIMULSM9DS0::IMUInit()
     //  configure IMU
 
     m_gyroSlaveAddr = m_settings->m_I2CSlaveAddress;
-    if (m_gyroSlaveAddr == LSM9DS0_GYRO_ADDRESS0)
-        m_accelCompassSlaveAddr = LSM9DS0_ACCELMAG_ADDRESS0;
-    else
+
+    // work out accelmag address
+
+    if (m_settings->HALRead(LSM9DS0_ACCELMAG_ADDRESS0, LSM9DS0_WHO_AM_I, 1, &result, "")) {
+        if (result == LSM9DS0_ACCELMAG_ID) {
+            m_accelCompassSlaveAddr = LSM9DS0_ACCELMAG_ADDRESS0;
+        }
+    } else {
         m_accelCompassSlaveAddr = LSM9DS0_ACCELMAG_ADDRESS1;
+    }
 
     setCalibrationData();
 
@@ -484,7 +490,7 @@ bool RTIMULSM9DS0::IMURead()
     if (!m_settings->HALRead(m_gyroSlaveAddr, LSM9DS0_GYRO_STATUS, 1, &status, "Failed to read LSM9DS0 status"))
         return false;
 
-    if ((status && 0x8) == 0)
+    if ((status & 0x8) == 0)
         return false;
 
     if (!m_settings->HALRead(m_gyroSlaveAddr, 0x80 | LSM9DS0_GYRO_OUT_X_L, 6, gyroData, "Failed to read LSM9DS0 gyro data"))

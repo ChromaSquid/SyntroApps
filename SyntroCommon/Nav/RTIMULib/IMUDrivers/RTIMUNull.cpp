@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -21,38 +21,34 @@
 //  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 //  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef _RTIMUNULL_H
-#define	_RTIMUNULL_H
+#include "RTIMUNull.h"
+#include "RTIMUSettings.h"
 
-//  IMUNull is a dummy IMU that assumes sensor data is coming from elsewhere,
-//  for example, across a network.
-//
-//  Call IMUInit in the normal way. Then for every update, call setIMUData and then IMURead
-//  to kick the kalman filter.
-
-#include "RTIMU.h"
-
-class RTIMUSettings;
-
-class RTIMUNull : public RTIMU
+RTIMUNull::RTIMUNull(RTIMUSettings *settings) : RTIMU(settings)
 {
-public:
-    RTIMUNull(RTIMUSettings *settings);
-    ~RTIMUNull();
+}
 
-    // The timestamp parameter is assumed to be from RTMath::currentUSecsSinceEpoch()
+RTIMUNull::~RTIMUNull()
+{
+}
 
-    void setIMUData(const RTIMU_DATA& data);
+bool RTIMUNull::IMUInit()
+{
+    return true;
+}
 
-    virtual const char *IMUName() { return "Null IMU"; }
-    virtual int IMUType() { return RTIMU_TYPE_NULL; }
-    virtual bool IMUInit();
-    virtual int IMUGetPollInterval();
-    virtual bool IMURead();
-    virtual bool IMUGyroBiasValid() { return true; }
+int RTIMUNull::IMUGetPollInterval()
+{
+    return (100);                                           // just a dummy value really
+}
 
-private:
-    uint64_t m_timestamp;
-};
+bool RTIMUNull::IMURead()
+{
+    updateFusion();
+    return true;
+}
 
-#endif // _RTIMUNULL_H
+void RTIMUNull::setIMUData(const RTIMU_DATA& data)
+{
+    m_imuData = data;
+}

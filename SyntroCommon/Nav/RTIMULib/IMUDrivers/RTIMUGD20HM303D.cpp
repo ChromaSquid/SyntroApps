@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -60,10 +60,16 @@ bool RTIMUGD20HM303D::IMUInit()
     //  configure IMU
 
     m_gyroSlaveAddr = m_settings->m_I2CSlaveAddress;
-    if (m_gyroSlaveAddr == L3GD20H_ADDRESS0)
-        m_accelCompassSlaveAddr = LSM303D_ADDRESS0;
-    else
+
+    // work out accel/mag address
+
+    if (m_settings->HALRead(LSM303D_ADDRESS0, LSM303D_WHO_AM_I, 1, &result, "")) {
+        if (result == LSM303D_ID) {
+            m_accelCompassSlaveAddr = LSM303D_ADDRESS0;
+        }
+    } else {
         m_accelCompassSlaveAddr = LSM303D_ADDRESS1;
+    }
 
     setCalibrationData();
 
@@ -74,10 +80,10 @@ bool RTIMUGD20HM303D::IMUInit()
 
     //  Set up the gyro
 
-    if (!m_settings->HALWrite(m_gyroSlaveAddr, L3GD20H_LOW_ODR, 0x04, "Failed to reset L3GD20"))
+    if (!m_settings->HALWrite(m_gyroSlaveAddr, L3GD20H_LOW_ODR, 0x04, "Failed to reset L3GD20H"))
         return false;
 
-    if (!m_settings->HALWrite(m_gyroSlaveAddr, L3GD20H_CTRL5, 0x80, "Failed to boot L3GD20"))
+    if (!m_settings->HALWrite(m_gyroSlaveAddr, L3GD20H_CTRL5, 0x80, "Failed to boot L3GD20H"))
         return false;
 
     if (!m_settings->HALRead(m_gyroSlaveAddr, L3GD20H_WHO_AM_I, 1, &result, "Failed to read L3GD20H id"))
@@ -508,7 +514,7 @@ bool RTIMUGD20HM303D::IMURead()
     if (!m_settings->HALRead(m_gyroSlaveAddr, L3GD20H_STATUS, 1, &status, "Failed to read L3GD20H status"))
         return false;
 
-    if ((status && 0x8) == 0)
+    if ((status & 0x8) == 0)
         return false;
 
     if (!m_settings->HALRead(m_gyroSlaveAddr, 0x80 | L3GD20H_OUT_X_L, 6, gyroData, "Failed to read L3GD20H data"))

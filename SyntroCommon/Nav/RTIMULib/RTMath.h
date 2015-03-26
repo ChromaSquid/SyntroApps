@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -55,7 +55,7 @@ public:
     static const char *display(const char *label, RTMatrix4x4& mat);
 
     //  currentUSecsSinceEpoch() is the source of all timestamps and
-    //  is the number of uS sonce the standard epoch
+    //  is the number of uS since the standard epoch
 
     static uint64_t currentUSecsSinceEpoch();
 
@@ -67,6 +67,9 @@ public:
 
     static void convertToVector(unsigned char *rawData, RTVector3& vec, RTFLOAT scale, bool bigEndian);
 
+    //  Takes a pressure in hPa and returns height above sea level in meters
+
+    static RTFLOAT convertPressureToHeight(RTFLOAT pressure, RTFLOAT staticPressure = 1013.25);
 
 private:
     static char m_string[1000];                             // for the display routines

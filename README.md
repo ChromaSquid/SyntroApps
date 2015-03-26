@@ -6,6 +6,10 @@ Check out www.richards-tech.com for more details.
 
 ### Release history
 
+#### March 26 2015 - 1.3.1
+
+Updated RTIMULib to latest version (5.6.0)
+
 #### November 19 2014 - 1.3.0
 
 Updated RTIMULib to latest version (4.2.0). Fixed some problems with the GS apps and reduced latency.

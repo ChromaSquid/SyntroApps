@@ -2,7 +2,7 @@
 //
 //  This file is part of RTIMULib
 //
-//  Copyright (c) 2014, richards-tech
+//  Copyright (c) 2014-2015, richards-tech
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -26,6 +26,8 @@
 
 #include "RTIMULibDefs.h"
 
+class RTIMUSettings;
+
 class RTFusion
 {
 public:
@@ -44,7 +46,7 @@ public:
     //  newIMUData() should be called for subsequent updates
     //  the fusion fields are updated with the results
 
-    virtual void newIMUData(RTIMU_DATA& /* data */) {}
+    virtual void newIMUData(RTIMU_DATA& /* data */, const RTIMUSettings * /* settings */) {}
 
     //  This static function returns performs the type to name mapping
 
@@ -52,9 +54,9 @@ public:
 
     //  the following three functions control the influence of the gyro, accel and compass sensors
 
-    void setGyroEnable(bool enable) { m_enableGyro = enable; reset();}
-    void setAccelEnable(bool enable) { m_enableAccel = enable; reset();}
-    void setCompassEnable(bool enable) { m_enableCompass = enable; reset();}
+    void setGyroEnable(bool enable) { m_enableGyro = enable;}
+    void setAccelEnable(bool enable) { m_enableAccel = enable; }
+    void setCompassEnable(bool enable) { m_enableCompass = enable;}
 
     inline const RTVector3& getMeasuredPose() {return m_measuredPose;}
     inline const RTQuaternion& getMeasuredQPose() {return m_measuredQPose;}
@@ -66,7 +68,7 @@ public:
     void setDebugEnable(bool enable) { m_debug = enable; }
 
 protected:
-    void calculatePose(const RTVector3& accel, const RTVector3& mag); // generates pose from accels and heading
+    void calculatePose(const RTVector3& accel, const RTVector3& mag, float magDeclination); // generates pose from accels and mag
 
     RTVector3 m_gyro;                                       // current gyro sample
     RTVector3 m_accel;                                      // current accel sample
@@ -83,6 +85,7 @@ protected:
     bool m_enableGyro;                                      // enables gyro as input
     bool m_enableAccel;                                     // enables accel as input
     bool m_enableCompass;                                   // enables compass a input
+    bool m_compassValid;                                    // true if compass data valid
 
     bool m_firstTime;                                       // if first time after reset
     uint64_t m_lastFusionTime;                              // for delta time calculation
