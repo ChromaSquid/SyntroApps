@@ -6,6 +6,10 @@ Check out www.richards-tech.com for more details.
 
 ### Release history
 
+#### March 31 2015 - 1.3.2
+
+Updated RTIMLib to latest version (6.1.0)
+
 #### March 26 2015 - 1.3.1
 
 Updated RTIMULib to latest version (5.6.0)

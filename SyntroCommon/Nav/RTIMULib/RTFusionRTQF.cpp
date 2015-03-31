@@ -25,20 +25,9 @@
 #include "RTFusionRTQF.h"
 #include "RTIMUSettings.h"
 
-//  The QVALUE affects the gyro response.
-
-#define RTQF_QVALUE	0.001f
-
-//  The RVALUE controls the influence of the accels and compass.
-//  The bigger the value, the more sluggish the response.
-
-#define RTQF_RVALUE	0.0005f
-
 
 RTFusionRTQF::RTFusionRTQF()
 {
-    m_Q = RTQF_QVALUE;
-    m_R = RTQF_RVALUE;
     reset();
 }
 
@@ -61,54 +50,63 @@ void RTFusionRTQF::reset()
 
 void RTFusionRTQF::predict()
 {
-    RTQuaternion tQuat;
     RTFLOAT x2, y2, z2;
+    RTFLOAT qs, qx, qy,qz;
 
-    //  compute the state transition matrix
+    if (!m_enableGyro)
+        return;
+
+    qs = m_stateQ.scalar();
+    qx = m_stateQ.x();
+    qy = m_stateQ.y();
+    qz = m_stateQ.z();
 
     x2 = m_gyro.x() / (RTFLOAT)2.0;
     y2 = m_gyro.y() / (RTFLOAT)2.0;
     z2 = m_gyro.z() / (RTFLOAT)2.0;
 
-    m_Fk.setVal(0, 1, -x2);
-    m_Fk.setVal(0, 2, -y2);
-    m_Fk.setVal(0, 3, -z2);
-
-    m_Fk.setVal(1, 0, x2);
-    m_Fk.setVal(1, 2, z2);
-    m_Fk.setVal(1, 3, -y2);
-
-    m_Fk.setVal(2, 0, y2);
-    m_Fk.setVal(2, 1, -z2);
-    m_Fk.setVal(2, 3, x2);
-
-    m_Fk.setVal(3, 0, z2);
-    m_Fk.setVal(3, 1, y2);
-    m_Fk.setVal(3, 2, -x2);
-
     // Predict new state
 
-    tQuat = m_Fk * m_stateQ;
-    tQuat *= m_timeDelta;
-    m_stateQ += tQuat;
+    m_stateQ.setScalar(qs + (-x2 * qx - y2 * qy - z2 * qz) * m_timeDelta);
+    m_stateQ.setX(qx + (x2 * qs + z2 * qy - y2 * qz) * m_timeDelta);
+    m_stateQ.setY(qy + (y2 * qs - z2 * qx + x2 * qz) * m_timeDelta);
+    m_stateQ.setZ(qz + (z2 * qs + y2 * qx - x2 * qy) * m_timeDelta);
+    m_stateQ.normalize();
 }
 
 
 void RTFusionRTQF::update()
 {
     if (m_enableCompass || m_enableAccel) {
-        m_stateQError = m_measuredQPose - m_stateQ;
-    } else {
-        m_stateQError = RTQuaternion();
+
+        // calculate rotation delta
+
+        m_rotationDelta = m_stateQ.conjugate() * m_measuredQPose;
+        m_rotationDelta.normalize();
+
+        // take it to the power (0 to 1) to give the desired amount of correction
+
+        RTFLOAT theta = acos(m_rotationDelta.scalar());
+
+        RTFLOAT sinPowerTheta = sin(theta * m_slerpPower);
+        RTFLOAT cosPowerTheta = cos(theta * m_slerpPower);
+
+        m_rotationUnitVector.setX(m_rotationDelta.x());
+        m_rotationUnitVector.setY(m_rotationDelta.y());
+        m_rotationUnitVector.setZ(m_rotationDelta.z());
+        m_rotationUnitVector.normalize();
+
+        m_rotationPower.setScalar(cosPowerTheta);
+        m_rotationPower.setX(sinPowerTheta * m_rotationUnitVector.x());
+        m_rotationPower.setY(sinPowerTheta * m_rotationUnitVector.y());
+        m_rotationPower.setZ(sinPowerTheta * m_rotationUnitVector.z());
+        m_rotationPower.normalize();
+
+        //  multiple this by predicted value to get result
+
+        m_stateQ *= m_rotationPower;
+        m_stateQ.normalize();
     }
-
-    // make new state estimate
-
-    RTFLOAT qt = m_Q * m_timeDelta;
-
-    m_stateQ += m_stateQError * (qt / (qt + m_R));
-
-    m_stateQ.normalize();
 }
 
 void RTFusionRTQF::newIMUData(RTIMU_DATA& data, const RTIMUSettings *settings)
@@ -130,7 +128,6 @@ void RTFusionRTQF::newIMUData(RTIMU_DATA& data, const RTIMUSettings *settings)
     if (m_firstTime) {
         m_lastFusionTime = data.timestamp;
         calculatePose(m_accel, m_compass, settings->m_compassAdjDeclination);
-        m_Fk.fill(0);
 
         //  initialize the poses
 
