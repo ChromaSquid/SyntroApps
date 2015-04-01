@@ -25,8 +25,8 @@ TEMPLATE = subdirs
 SUBDIRS = SyntroLCam \
     SyntroReview \
     SyntroView \
-	SyntroNavView \
-	SyntroExec \
-	SyntroPanaCam \
-	SyntroGloveView
+    SyntroNavView \
+    SyntroExec \
+    SyntroPanaCam \
+    SyntroGloveView
 

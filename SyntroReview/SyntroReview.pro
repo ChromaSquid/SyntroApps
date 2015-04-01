@@ -20,10 +20,10 @@
 TARGET = SyntroReview
 
 win32* {
-	DESTDIR = Release
+    DESTDIR = Release
 }
 else {
-	DESTDIR = Output 
+    DESTDIR = Output
 }
 
 QT += core gui network
@@ -44,7 +44,7 @@ unix {
                                 /usr/local/include/syntro/SyntroControlLib \
                                 /usr/local/include/syntro/SyntroAV
 
-                target.path = /usr/local/bin
+                target.path = /Applications
         }
         else {
                 CONFIG += link_pkgconfig
@@ -65,10 +65,10 @@ INCLUDEPATH += GeneratedFiles
 win32-g++:LIBS += -L"$(SYNTRODIR)/bin"
 win32-msvc*:LIBS += -L"$(SYNTRODIR)/lib"
 win32 {
-	DEFINES += _CRT_SECURE_NO_WARNINGS
-	INCLUDEPATH += $(SYNTRODIR)/include
+    DEFINES += _CRT_SECURE_NO_WARNINGS
+    INCLUDEPATH += $(SYNTRODIR)/include
       LIBS += -lSyntroLib \
-                -lSyntroGUI 
+                -lSyntroGUI
 }
 
 MOC_DIR += GeneratedFiles/release

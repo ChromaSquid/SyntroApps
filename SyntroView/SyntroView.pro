@@ -1,6 +1,6 @@
 #
 #  Copyright (c) 2014 Scott Ellis and Richard Barnett
-#	
+#
 #  This file is part of SyntroNet
 #
 #  SyntroNet is free software: you can redistribute it and/or modify
@@ -23,10 +23,10 @@ TEMPLATE = app
 TARGET = SyntroView
 
 win32* {
-	DESTDIR = Release
+    DESTDIR = Release
 }
 else {
-	DESTDIR = Output 
+    DESTDIR = Output
 }
 
 QT += core gui network
@@ -35,28 +35,27 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += debug_and_release
 
 unix {
-	macx {
-		LIBS += /usr/local/lib/libSyntroLib.dylib \
-			/usr/local/lib/libSyntroGUI.dylib \
-			/usr/local/lib/libSyntroControlLib.dylib
+    macx {
+        LIBS += /usr/local/lib/libSyntroLib.dylib \
+            /usr/local/lib/libSyntroGUI.dylib \
+            /usr/local/lib/libSyntroControlLib.dylib
 
                 QT += multimedia
 
-		INCLUDEPATH += /usr/local/include/syntro \
-				/usr/local/include/syntro/SyntroControlLib \
-				/usr/local/include/syntro/SyntroAV
+        INCLUDEPATH += /usr/local/include/syntro \
+                /usr/local/include/syntro/SyntroControlLib \
+                /usr/local/include/syntro/SyntroAV
 
-		target.path = /usr/local/bin
-	}
-	else {
-		CONFIG += link_pkgconfig
-		PKGCONFIG += syntro
+        target.path = /Applications
+    } else {
+        CONFIG += link_pkgconfig
+        PKGCONFIG += syntro
 
-		LIBS += -lasound
-		target.path = /usr/bin
-	}
+        LIBS += -lasound
+        target.path = /usr/bin
+    }
 
-	INSTALLS += target
+    INSTALLS += target
 }
 
 DEFINES += QT_NETWORK_LIB
@@ -68,9 +67,9 @@ win32-g++:LIBS += -L"$(SYNTRODIR)/bin"
 win32-msvc*:LIBS += -L"$(SYNTRODIR)/lib"
 
 win32 {
-	DEFINES += _CRT_SECURE_NO_WARNINGS
-	INCLUDEPATH += $(SYNTRODIR)/include
-	LIBS += -lSyntroLib -lSyntroGUI
+    DEFINES += _CRT_SECURE_NO_WARNINGS
+    INCLUDEPATH += $(SYNTRODIR)/include
+    LIBS += -lSyntroLib -lSyntroGUI
 }
 
 MOC_DIR += GeneratedFiles/moc

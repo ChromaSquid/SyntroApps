@@ -36,9 +36,8 @@ unix {
                                 /usr/local/include/syntro/SyntroControlLib \
                                 /usr/local/include/syntro/SyntroAV
 
-                target.path = /usr/local/bin
-        }
-        else {
+                target.path = /Applications
+        } else {
                 CONFIG += link_pkgconfig
                 PKGCONFIG += syntro
                 target.path = /usr/bin
