@@ -34,9 +34,13 @@
 typedef struct
 {
     SYNTRO_UC8 timestamp;                                   // this is the timestamp of the sample with microsecond resolution
-    float fusionQPosePalm[4];                               // the palm fused quaternion pose 
-    float fusionQPoseThumb[4];                              // the thumb fused quaternion pose 
-    float fusionQPoseFinger[4];                             // the finger fused quaternion pose 
+    float fusionQPosePalm[4];                               // the palm fused quaternion pose
+    float fusionQPoseThumb[4];                              // the thumb fused quaternion pose
+    float fusionQPoseFinger[4];                             // the finger fused quaternion pose
+    unsigned char active;                                   // true if glove is active
+    unsigned char spare0;
+    unsigned char spare1;
+    unsigned char spare2;
 } SYNTRO_GLOVEDATA;
 
 

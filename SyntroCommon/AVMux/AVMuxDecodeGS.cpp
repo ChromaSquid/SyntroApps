@@ -109,6 +109,13 @@ AVMuxDecode::AVMuxDecode() : SyntroThread("AVMuxDecode", "AVMuxDecode")
 
 void AVMuxDecode::initThread()
 {
+    static int argc;
+    static char **argv;
+    argv = (char **)malloc(sizeof(char *) * 1);
+
+    argv[0] = "AVMuxDecodeGS";
+    gst_init(&argc, &argv);
+
     m_timer = startTimer(AVMUXDECODE_INTERVAL);
 }
 
@@ -652,9 +659,9 @@ void AVMuxDecode::putRTPVideoCaps(unsigned char *data, int length)
 
     m_waitingForVideoCaps = false;
 
-#ifdef GSTBUSMSG
+//#ifdef GSTBUSMSG
     qDebug() << "Video caps " << QString((char *)data);
-#endif
+//#endif
 
     ret = gst_element_set_state (m_videoPipeline, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {

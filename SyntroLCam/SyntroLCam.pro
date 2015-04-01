@@ -45,11 +45,12 @@ INCLUDEPATH += GeneratedFiles
 
 MOC_DIR += GeneratedFiles/moc
 
-OBJECTS_DIR += objects  
+OBJECTS_DIR += objects
 
 UI_DIR += GeneratedFiles
 
 RCC_DIR += GeneratedFiles
 
 include(SyntroLCam.pri)
+
 

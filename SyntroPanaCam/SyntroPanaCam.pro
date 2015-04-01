@@ -18,11 +18,11 @@
 #//
 
 TEMPLATE = app
-TARGET = SyntroExec
+TARGET = SyntroPanaCam
 DESTDIR = Output
 QT += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-CONFIG += debug_and_release link_pkgconfig
+CONFIG += release link_pkgconfig
 
 unix {
         macx {
@@ -40,20 +40,18 @@ unix {
         } else {
                 CONFIG += link_pkgconfig
                 PKGCONFIG += syntro
-
                 target.path = /usr/bin
         }
 
         INSTALLS += target
 }
 
-
 DEFINES += QT_NETWORK_LIB
-INCLUDEPATH += GeneratedFiles
+INCLUDEPATH += GeneratedFiles \
+    ../Common
 DEPENDPATH +=
 MOC_DIR += GeneratedFiles/release
 OBJECTS_DIR += release
 UI_DIR += GeneratedFiles
 RCC_DIR += GeneratedFiles
-include(SyntroExec.pri)
-
+include(SyntroPanaCam.pri)

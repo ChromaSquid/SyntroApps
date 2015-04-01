@@ -66,7 +66,7 @@ SyntroNavView::SyntroNavView(QWidget *parent)
 
     m_client->resumeThread();
 
-    m_imuSettings = new RTIMUSettings("SyntroNavView");
+    m_imuSettings = new RTIMUSettings();
     m_imuSettings->m_imuType = RTIMU_TYPE_NULL;
     m_imuSettings->saveSettings();
     m_imu = (RTIMUNull *)RTIMU::createIMU(m_imuSettings);

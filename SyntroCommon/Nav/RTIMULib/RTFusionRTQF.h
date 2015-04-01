@@ -46,11 +46,6 @@ public:
 
     void newIMUData(RTIMU_DATA& data, const RTIMUSettings *settings);
 
-    //  the following two functions can be called to customize the noise covariance
-
-    void setQ(RTFLOAT Q) {  m_Q = Q; reset();}
-    void setR(RTFLOAT R) { if (R > 0) m_R = R; reset();}
-
 private:
     void predict();
     void update();
@@ -60,10 +55,6 @@ private:
 
     RTQuaternion m_stateQ;									// quaternion state vector
     RTQuaternion m_stateQError;                             // difference between stateQ and measuredQ
-
-    RTFLOAT m_Q;                                            // process noise covariance
-    RTMatrix4x4 m_Fk;                                       // the state transition matrix
-    RTFLOAT m_R;                                            // the measurement noise covariance
 
     int m_sampleNumber;
 };
