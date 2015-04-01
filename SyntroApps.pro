@@ -22,6 +22,14 @@ greaterThan(QT_MAJOR_VERSION, 4): cache()
 
 TEMPLATE = subdirs
 
+macx {
+SUBDIRS = SyntroReview \
+    SyntroView \
+    SyntroNavView \
+    SyntroExec \
+    SyntroPanaCam \
+    SyntroGloveView
+} else {
 SUBDIRS = SyntroLCam \
     SyntroReview \
     SyntroView \
@@ -29,4 +37,4 @@ SUBDIRS = SyntroLCam \
     SyntroExec \
     SyntroPanaCam \
     SyntroGloveView
-
+}

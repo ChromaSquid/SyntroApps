@@ -17,10 +17,6 @@
 #  along with SyntroNet.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-unix {
-    macx {
-    } else {
-
 greaterThan(QT_MAJOR_VERSION, 4): cache()
 
 TEMPLATE = app
@@ -56,6 +52,5 @@ UI_DIR += GeneratedFiles
 RCC_DIR += GeneratedFiles
 
 include(SyntroLCam.pri)
-    }
-}
+
 
